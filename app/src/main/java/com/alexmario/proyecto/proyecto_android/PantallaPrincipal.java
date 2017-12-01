@@ -77,8 +77,8 @@ public class PantallaPrincipal extends AppCompatActivity
             startActivity(new Intent(this,Main3Activity.class));
         } else if (id == R.id.pantalla4) {
 
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.settings) {
+            startActivity(new Intent(this,SettingsActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
