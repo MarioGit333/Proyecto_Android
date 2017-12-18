@@ -70,15 +70,15 @@ public class PantallaPrincipal extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.pantalla1) {
-            startActivity(new Intent(this,MainActivity.class));
+            startActivity(new Intent(this, MapsActivity.class));
         } else if (id == R.id.pantalla2) {
-            startActivity(new Intent(this,Main2Activity.class));
+            startActivity(new Intent(this, Main2Activity.class));
         } else if (id == R.id.pantalla3) {
-            startActivity(new Intent(this,Main3Activity.class));
+            startActivity(new Intent(this, Main3Activity.class));
         } else if (id == R.id.pantalla4) {
 
         } else if (id == R.id.settings) {
-            startActivity(new Intent(this,SettingsActivity.class));
+            startActivity(new Intent(this, SettingsActivity.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
