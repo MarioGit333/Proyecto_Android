@@ -39,12 +39,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LocationListener {
 
     private GoogleMap mMap;
-    Button botonmapa, botonsatelite, botonhibrido, botonInterior;
+    Button botonmapa, botonsatelite, botonhibrido, botonInterior, btnRuta;
     LocationRequest mPeticionUbicacion;
     GoogleApiClient mGoogleApiClient;
     Location mUltimaUbicacion;
     Marker mMarcadorActual;
     PolylineOptions rectOptions;
+    boolean rutaIniciada;
 
     @Override
     protected void onPause() {
@@ -61,15 +62,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        rutaIniciada=false;
+
         botonmapa = findViewById(R.id.botonmapa);
         botonsatelite = findViewById(R.id.botonsatelite);
         botonhibrido = findViewById(R.id.botonhibrido);
         botonInterior = findViewById(R.id.botonInterior);
+        btnRuta = findViewById(R.id.btnRuta);
 
         botonmapa.setOnClickListener(this);
         botonsatelite.setOnClickListener(this);
         botonhibrido.setOnClickListener(this);
         botonInterior.setOnClickListener(this);
+        btnRuta.setOnClickListener(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -138,6 +143,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.botonInterior:
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-33.86997, 151.2089), 18));
                 break;
+            case R.id.btnRuta:
+                if (rutaIniciada){
+                    rutaIniciada=false;
+                    btnRuta.setText("Iniciar Ruta");
+                }else{
+                    rutaIniciada=true;
+                    btnRuta.setText("Finalizar Ruta");
+                }
+                break;
         }
     }
 
@@ -192,10 +206,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
 
         //Dibujamos la ruta
-        rectOptions.add(latLng).width(10)
-                .color(Color.BLUE)
-                .geodesic(false);
-        Polyline polyline = mMap.addPolyline(rectOptions);
+        if (rutaIniciada){
+            rectOptions.add(latLng).width(10)
+                    .color(Color.BLUE)
+                    .geodesic(false);
+            Polyline polyline = mMap.addPolyline(rectOptions);
+        }
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
