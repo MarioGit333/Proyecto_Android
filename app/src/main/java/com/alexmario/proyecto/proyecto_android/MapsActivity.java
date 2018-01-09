@@ -44,6 +44,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GoogleApiClient mGoogleApiClient;
     Location mUltimaUbicacion;
     Marker mMarcadorActual;
+    PolylineOptions rectOptions;
 
     @Override
     protected void onPause() {
@@ -108,19 +109,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-        final PolylineOptions rectOptions = new PolylineOptions();
+        rectOptions = new PolylineOptions();
 
-
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-
-                rectOptions.add(latLng).width(10)
-                        .color(Color.BLUE)
-                        .geodesic(true);
-                Polyline polyline = mMap.addPolyline(rectOptions);
-            }
-        });
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -200,6 +190,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Centramos la camara en nuestra ubicacion actual.
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
+
+        //Dibujamos la ruta
+        rectOptions.add(latLng).width(10)
+                .color(Color.BLUE)
+                .geodesic(false);
+        Polyline polyline = mMap.addPolyline(rectOptions);
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
