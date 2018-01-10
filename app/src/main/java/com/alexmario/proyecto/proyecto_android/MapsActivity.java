@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -20,6 +21,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -40,6 +43,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -62,6 +66,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Toast toast;
     private String regex, temporizadorTxt, avisoTxt;
     private int temporizador, aviso;
+    private Chronometer cronometro;
+    private TextView textoDistancia;
+    private long pausaCronometro;
+    private List<Polyline> polylineList;
 
     @Override
     protected void onPause() {
@@ -85,17 +93,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         latLngList = new ArrayList<>();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         vibrador = (Vibrator) (getSystemService(Service.VIBRATOR_SERVICE));
+        cronometro=findViewById(R.id.chronometer2);
+        textoDistancia= findViewById(R.id.distanciaView);
 
-        botonmapa = findViewById(R.id.botonmapa);
-        botonsatelite = findViewById(R.id.botonsatelite);
-        botonhibrido = findViewById(R.id.botonhibrido);
-        botonInterior = findViewById(R.id.botonInterior);
+
+
         btnRuta = findViewById(R.id.btnRuta);
 
-        botonmapa.setOnClickListener(this);
-        botonsatelite.setOnClickListener(this);
-        botonhibrido.setOnClickListener(this);
-        botonInterior.setOnClickListener(this);
+
         btnRuta.setOnClickListener(this);
         sonido = prefs.getBoolean("sonido", false);
         vibracion = prefs.getBoolean("vibracion", false);
@@ -122,15 +127,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -154,6 +150,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         rectOptions = new PolylineOptions();
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(17));
+
 
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -170,25 +168,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onClick(View view) {
         switch (view.getId()) { //Cambiar el tipo de mapa en funcion del boton pulsado.
-            case R.id.botonmapa:
-                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                break;
-            case R.id.botonsatelite:
-                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                break;
-            case R.id.botonhibrido:
-                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                break;
-            case R.id.botonInterior:
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-33.86997, 151.2089), 18));
-                break;
+
             case R.id.btnRuta:
                 if (rutaIniciada) {
+                    cronometro.stop();
                     if (latLngList.size() > 1) {
                         //Mediante el SphericalUtil, se calcula la distancia total dada por los LatLng guardados.
-                        toast = Toast.makeText(getApplicationContext(),
-                                "Distancia recorrida: " + SphericalUtil.computeLength(latLngList),
-                                Toast.LENGTH_LONG);
+                        double distancia=SphericalUtil.computeLength(latLngList)/1000;//Dividido entre 100 para mostrar en km
+                        Toast.makeText(getApplicationContext(),
+                                "Distancia recorrida: " + String.format("%.2f",distancia) +" kilómetros en "
+                                + cronometro.getText(),
+                                Toast.LENGTH_LONG).show();
                     }
                     rutaIniciada = false;
                     btnRuta.setText("Iniciar Ruta");
@@ -201,9 +191,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             temporizador = Integer.parseInt(temporizadorTxt) ;
                         }
                     }
+                    cronometro.setBase(SystemClock.elapsedRealtime());
+                    cronometro.start();
+
                     contador.start();
                     rutaIniciada = true;
                     btnRuta.setText("Finalizar Ruta");
+
+                    latLngList=new ArrayList<>();
+                    rectOptions = new PolylineOptions();
+                    /*if (!polylineList.isEmpty()){
+                        for (Polyline p: polylineList) {
+                            p.remove();
+                        }
+                        polylineList.clear();
+                    }*/
+
+
+
                 }
                 break;
         }
@@ -257,7 +262,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMarcadorActual = mMap.addMarker(markerOptions); //Añadimos el marcador al fragment del mapa.
 
         //Centramos la camara en nuestra ubicacion actual.
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
         //Añadimos el LatLng actual a la lista para, al acabar, obtener una distancia total
         latLngList.add(latLng);
@@ -268,6 +273,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .color(Color.BLUE)
                     .geodesic(false);
             Polyline polyline = mMap.addPolyline(rectOptions);
+
+
+            double distancia=SphericalUtil.computeLength(latLngList)/1000;
+
+            textoDistancia.setText("DISTANCIA: "+ String.format("%.2f",distancia)+" km");
 
         }
     }
