@@ -1,12 +1,17 @@
 package com.alexmario.proyecto.proyecto_android;
 
 import android.Manifest;
+import android.app.Service;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -32,6 +37,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -39,13 +47,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LocationListener {
 
     private GoogleMap mMap;
-    Button botonmapa, botonsatelite, botonhibrido, botonInterior, btnRuta;
-    LocationRequest mPeticionUbicacion;
-    GoogleApiClient mGoogleApiClient;
-    Location mUltimaUbicacion;
-    Marker mMarcadorActual;
-    PolylineOptions rectOptions;
-    boolean rutaIniciada;
+    private Button botonmapa, botonsatelite, botonhibrido, botonInterior, btnRuta;
+    private LocationRequest mPeticionUbicacion;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mUltimaUbicacion;
+    private Marker mMarcadorActual;
+    private CountDownTimer contador;
+    private PolylineOptions rectOptions;
+    private boolean rutaIniciada, sonido, vibracion;
+    private SharedPreferences prefs;
+    private Vibrator vibrador;
+    private ArrayList<LatLng> latLngList;
+    private LatLng latLng;
+    private Toast toast;
+    private String regex, temporizadorTxt, avisoTxt;
+    private int temporizador, aviso;
 
     @Override
     protected void onPause() {
@@ -62,7 +78,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        rutaIniciada=false;
+        rutaIniciada = false;
+        regex = "\\d+";
+        aviso = 15; //
+        temporizador = 30;
+        latLngList = new ArrayList<>();
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        vibrador = (Vibrator) (getSystemService(Service.VIBRATOR_SERVICE));
 
         botonmapa = findViewById(R.id.botonmapa);
         botonsatelite = findViewById(R.id.botonsatelite);
@@ -75,8 +97,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         botonhibrido.setOnClickListener(this);
         botonInterior.setOnClickListener(this);
         btnRuta.setOnClickListener(this);
+        sonido = prefs.getBoolean("sonido", false);
+        vibracion = prefs.getBoolean("vibracion", false);
+        temporizadorTxt = prefs.getString("temporizador", "30");
+        avisoTxt = prefs.getString("aviso","15");
+        ////////
+        contador = new CountDownTimer(temporizador,aviso) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (vibracion) {
+                    vibrador.vibrate(100);
+                }
+            }
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+            @Override
+            public void onFinish() {
+                toast = Toast.makeText(getApplicationContext(), "Ruta acabada", Toast.LENGTH_SHORT);
+            }
+        };
+        /////
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -144,11 +183,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-33.86997, 151.2089), 18));
                 break;
             case R.id.btnRuta:
-                if (rutaIniciada){
-                    rutaIniciada=false;
+                if (rutaIniciada) {
+                    if (latLngList.size() > 1) {
+                        //Mediante el SphericalUtil, se calcula la distancia total dada por los LatLng guardados.
+                        toast = Toast.makeText(getApplicationContext(),
+                                "Distancia recorrida: " + SphericalUtil.computeLength(latLngList),
+                                Toast.LENGTH_LONG);
+                    }
+                    rutaIniciada = false;
                     btnRuta.setText("Iniciar Ruta");
-                }else{
-                    rutaIniciada=true;
+                } else {
+                    if (vibracion || sonido) {
+                        if(avisoTxt.matches(regex)){
+                            aviso = Integer.parseInt(avisoTxt) ;
+                        }
+                        if(temporizadorTxt.matches(regex)){
+                            temporizador = Integer.parseInt(temporizadorTxt) ;
+                        }
+                    }
+                    contador.start();
+                    rutaIniciada = true;
                     btnRuta.setText("Finalizar Ruta");
                 }
                 break;
@@ -195,7 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         //Colocamos el marcador en la ubicacion actual dada por la API de Google y nuestro GPS.
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions(); //Ajustamos el LatLng a las coordenadas que devuelve el GPS.
         markerOptions.position(latLng);
         markerOptions.title("Posicion actual"); //Titulo para el marcador.
@@ -205,16 +259,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Centramos la camara en nuestra ubicacion actual.
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
 
+        //Añadimos el LatLng actual a la lista para, al acabar, obtener una distancia total
+        latLngList.add(latLng);
+
         //Dibujamos la ruta
-        if (rutaIniciada){
+        if (rutaIniciada) {
             rectOptions.add(latLng).width(10)
                     .color(Color.BLUE)
                     .geodesic(false);
             Polyline polyline = mMap.addPolyline(rectOptions);
+
         }
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
     //Comprobacion de permisos.
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -248,6 +307,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
