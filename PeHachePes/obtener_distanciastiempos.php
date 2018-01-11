@@ -1,6 +1,6 @@
 <?php
 /**
- * Obtiene todas las alumnos de la base de datos
+ * Obtiene todas los datos de la ruta de la base de datos
  */
 
 require 'Distanciastiempos.php';

@@ -377,6 +377,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     urlConn.connect();
                     //Creo el Objeto JSON
                     JSONObject jsonParam = new JSONObject();
+
                     strings[3] = strings[3].substring(0, 2);
                     if (Integer.parseInt(strings[3]) == 0) {
                         strings[3] = "1";

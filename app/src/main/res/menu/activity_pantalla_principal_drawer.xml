@@ -7,11 +7,11 @@
         <item
             android:id="@+id/pantalla1"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Pantalla 1" />
+            android:title="Iniciar Ruta" />
         <item
             android:id="@+id/pantalla2"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Pantalla 2" />
+            android:title="Ver últimas rutas" />
         <item
             android:id="@+id/pantalla3"
             android:icon="@drawable/ic_menu_slideshow"
