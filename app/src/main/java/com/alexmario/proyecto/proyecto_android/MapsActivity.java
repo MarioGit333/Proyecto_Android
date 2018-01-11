@@ -258,7 +258,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Dibujamos la ruta
         if (rutaIniciada) {
-            rectOptions.add(latLng).width(10)
+            rectOptions.add(latLng).width(15)
                     .color(Color.BLUE)
                     .geodesic(false);
             polyline = mMap.addPolyline(rectOptions);
@@ -378,12 +378,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //Creo el Objeto JSON
                     JSONObject jsonParam = new JSONObject();
 
-                    strings[3] = strings[3].substring(0, 2);
-                    if (Integer.parseInt(strings[3]) == 0) {
-                        strings[3] = "1";
-                    }
+                    int minutos=Integer.parseInt(strings[3].substring(0,2));
+                    int segundos=Integer.parseInt(strings[3].substring(3,5));
+                    if (minutos>0)
+                        segundos+=minutos*60;
+
                     jsonParam.put("distancia", Double.parseDouble(strings[2]));
-                    jsonParam.put("tiempo", Integer.parseInt(strings[3]));
+                    jsonParam.put("tiempo", segundos);
                     // Envio los parámetros post.
                     OutputStream os = urlConn.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(
@@ -412,11 +413,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
 
-                        if (resultJSON == "1") {      // hay un alumno que mostrar
-                            devuelve = "Alumno insertado correctamente";
+                        if (resultJSON == "1") {      // hay una ruta que mostrar
+                            devuelve = "Ruta insertada correctamente";
 
                         } else if (resultJSON == "2") {
-                            devuelve = "El alumno no pudo insertarse";
+                            devuelve = "La ruta no pudo insertarse";
                         }
 
                     }

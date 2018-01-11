@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -28,18 +29,37 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main2Activity extends AppCompatActivity {
 
     TextView resultado;
     private ObtenerWebService hiloConexion;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private ArrayList<Ruta> rutas=new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-        resultado=findViewById(R.id.resultado);
+
+
+        recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        // use this setting to
+        // improve performance if you know that changes
+        // in content do not change the layout size
+        // of the RecyclerView
+        recyclerView.setHasFixedSize(true);
+        // use a linear layout manager
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+
 
         String IP = "http://servicioandroid.000webhostapp.com";
         // Rutas de los Web Services
@@ -72,7 +92,7 @@ public class Main2Activity extends AppCompatActivity {
             String devuelve = "";
 
 
-            if (params[1] == "1") {    // Consulta de todos los alumnos
+            if (params[1] == "1") {    // Consulta de todos las rutas
 
                 try {
                     url = new URL(cadena);
@@ -109,21 +129,41 @@ public class Main2Activity extends AppCompatActivity {
 
 
                         System.out.println(resultJSON);
-                        if (resultJSON.equals("1")) {      // hay alumnos a mostrar
+                        if (resultJSON.equals("1")) {      // hay rutas a mostrar
 
-                            JSONArray alumnosJSON = respuestaJSON.getJSONArray("distanciastiempo");   // estado es el nombre del campo en el JSON
-                            System.out.println(alumnosJSON.length());
-                            for (int i = 0; i < alumnosJSON.length(); i++) {
-                                devuelve = devuelve + alumnosJSON.getJSONObject(i).getString("id") + " " +
-                                        alumnosJSON.getJSONObject(i).getString("nombre") + " " +
-                                        alumnosJSON.getJSONObject(i).getString("distancia") + " " +
-                                        alumnosJSON.getJSONObject(i).getString("tiempo") + "\n";
-                                System.out.println(devuelve);
+                            JSONArray rutasJSON = respuestaJSON.getJSONArray("distanciastiempo");   // estado es el nombre del campo en el JSON
+                            System.out.println(rutasJSON.length());
+                            for (int i = 0; i < rutasJSON.length(); i++) {
+
+
+                                int segundos=Integer.parseInt(rutasJSON.getJSONObject(i).getString("tiempo"));
+                                int minutos=0;
+                                if (segundos>=60){
+                                    minutos=segundos/60;
+                                    segundos=segundos%60;
+                                }
+                                String tiempo;
+                                if (segundos<10){
+                                    tiempo=minutos+":0"+segundos;
+                                }else{
+                                    tiempo=minutos+":"+segundos;
+                                }
+
+
+                                Ruta ruta=new Ruta(rutasJSON.getJSONObject(i).getString("distancia"),
+                                        tiempo);
+
+                                rutas.add(ruta);
+
                             }
 
+                            List<Ruta> input = rutas;
+
+                            mAdapter = new MyAdapter(input);
+
+
                         } else if (resultJSON.equals("2")) {
-                            System.out.println("jaja");
-                            devuelve = "No hay alumnos";
+                            devuelve = "No hay rutas";
                         }
 
 
@@ -153,7 +193,8 @@ public class Main2Activity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             //super.onPostExecute(s);
-            resultado.setText(s);
+            recyclerView.setAdapter(mAdapter);
+
         }
 
         @Override
