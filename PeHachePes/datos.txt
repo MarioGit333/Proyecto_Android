@@ -25,6 +25,10 @@ insert into distanciatiempo (distancia, tiempo, nombre)
 VALUES (123.24, 55, 'Pedro'),
 		(50, 10, 'Luis');
 		
+-- Datos Postman
+servicioandroid@endrix.org
+servicioandroid
+administrador
 --
 
 

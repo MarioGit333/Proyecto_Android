@@ -2,11 +2,15 @@ package com.alexmario.proyecto.proyecto_android;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -41,6 +45,20 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Vibrator vibrador;
     private ArrayList<LatLng> latLngList;
     private LatLng latLng;
+    private ObtenerWebService hiloConexion;
     private Toast toast;
     private String regex, temporizadorTxt;
     private int temporizador;
@@ -132,6 +151,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.zoomTo(17));
     }
 
+    private boolean hayConexion(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context
+                .CONNECTIVITY_SERVICE); //Comprobamos que estamos conectados a internet
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+        if (info == null || !info.isConnected() || !info.isAvailable()) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public void onClick(View view) {
@@ -142,11 +170,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     cronometro.stop();
                     if (latLngList.size() > 1) {
                         //Mediante el SphericalUtil, se calcula la distancia total dada por los LatLng guardados.
-                        //distancia = SphericalUtil.computeLength(latLngList) / 1000;//Dividido entre 1000 para mostrar en km
+                        distancia = SphericalUtil.computeLength(latLngList) / 1000;//Dividido entre 1000 para mostrar en km
                         Toast.makeText(getApplicationContext(),
                                 "Distancia recorrida: " + String.format("%.2f", distancia) + " kilómetros en "
                                         + cronometro.getText(),
                                 Toast.LENGTH_LONG).show();
+                        if (hayConexion(getApplicationContext())) {//Si estamos conectados a internet
+                            hiloConexion = new ObtenerWebService();
+                            hiloConexion.execute(
+                                    "http://servicioandroid.000webhostapp.com/insertar_distanciatiempo.php",
+                                    "1", String.valueOf(distancia), (String) cronometro.getText());
+                        }
                     }
                     rutaIniciada = false;
                     btnRuta.setText("Iniciar Ruta");
@@ -300,4 +334,101 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // permissions this app might request
         }
     }
+
+    public class ObtenerWebService extends AsyncTask<String, Void, String> {
+        String devuelve = "";
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onCancelled(String s) {
+            super.onCancelled(s);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            if (strings[1] == "1") { //insercion
+                URL url;
+
+                try {
+                    url = new URL(strings[0]);
+                    HttpURLConnection urlConn;
+                    DataOutputStream printout;
+                    DataInputStream input;
+                    url = new URL(strings[0]);
+                    urlConn = (HttpURLConnection) url.openConnection();
+                    urlConn.setDoInput(true);
+                    urlConn.setDoOutput(true);
+                    urlConn.setUseCaches(false);
+                    urlConn.setRequestProperty("Content-Type", "application/json");
+                    urlConn.setRequestProperty("Accept", "application/json");
+                    urlConn.connect();
+                    //Creo el Objeto JSON
+                    JSONObject jsonParam = new JSONObject();
+                    strings[3] = strings[3].substring(0, 2);
+                    if (Integer.parseInt(strings[3]) == 0) {
+                        strings[3] = "1";
+                    }
+                    jsonParam.put("distancia", Double.parseDouble(strings[2]));
+                    jsonParam.put("tiempo", Integer.parseInt(strings[3]));
+                    // Envio los parámetros post.
+                    OutputStream os = urlConn.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(
+                            new OutputStreamWriter(os, "UTF-8"));
+                    writer.write(jsonParam.toString());
+                    writer.flush();
+                    writer.close();
+
+                    int respuesta = urlConn.getResponseCode();
+
+
+                    StringBuilder result = new StringBuilder();
+
+                    if (respuesta == HttpURLConnection.HTTP_OK) {
+
+                        String line;
+                        BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
+                        while ((line = br.readLine()) != null) {
+                            result.append(line);
+                            //response+=line;
+                        }
+
+                        //Creamos un objeto JSONObject para poder acceder a los atributos (campos) del objeto.
+                        JSONObject respuestaJSON = new JSONObject(result.toString());   //Creo un JSONObject a partir del StringBuilder pasado a cadena
+                        //Accedemos al vector de resultados
+
+                        String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
+
+                        if (resultJSON == "1") {      // hay un alumno que mostrar
+                            devuelve = "Alumno insertado correctamente";
+
+                        } else if (resultJSON == "2") {
+                            devuelve = "El alumno no pudo insertarse";
+                        }
+
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            return devuelve;
+        }
+    }
 }
+
