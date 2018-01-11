@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -51,21 +50,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LocationListener {
 
     private GoogleMap mMap;
-    private Button botonmapa, botonsatelite, botonhibrido, botonInterior, btnRuta;
+    private Button btnRuta;
     private LocationRequest mPeticionUbicacion;
     private GoogleApiClient mGoogleApiClient;
     private Location mUltimaUbicacion;
     private Marker mMarcadorActual;
-    private CountDownTimer contador;
     private PolylineOptions rectOptions;
+    private Polyline polyline;
     private boolean rutaIniciada, sonido, vibracion;
     private SharedPreferences prefs;
+    private double distancia;
     private Vibrator vibrador;
     private ArrayList<LatLng> latLngList;
     private LatLng latLng;
     private Toast toast;
-    private String regex, temporizadorTxt, avisoTxt;
-    private int temporizador, aviso;
+    private String regex, temporizadorTxt;
+    private int temporizador;
     private Chronometer cronometro;
     private TextView textoDistancia;
     private long pausaCronometro;
@@ -74,7 +74,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onPause() {
         super.onPause();
-
         //Detiene las actualizaciones del mapa cuando la activity no esta activa.
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -88,14 +87,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         rutaIniciada = false;
         regex = "\\d+";
-        aviso = 15; //
         temporizador = 30;
         latLngList = new ArrayList<>();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         vibrador = (Vibrator) (getSystemService(Service.VIBRATOR_SERVICE));
-        cronometro=findViewById(R.id.chronometer2);
-        textoDistancia= findViewById(R.id.distanciaView);
-
+        cronometro = findViewById(R.id.chronometer2);
+        textoDistancia = findViewById(R.id.distanciaView);
 
 
         btnRuta = findViewById(R.id.btnRuta);
@@ -105,22 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         sonido = prefs.getBoolean("sonido", false);
         vibracion = prefs.getBoolean("vibracion", false);
         temporizadorTxt = prefs.getString("temporizador", "30");
-        avisoTxt = prefs.getString("aviso","15");
-        ////////
-        contador = new CountDownTimer(temporizador,aviso) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (vibracion) {
-                    vibrador.vibrate(100);
-                }
-            }
 
-            @Override
-            public void onFinish() {
-                toast = Toast.makeText(getApplicationContext(), "Ruta acabada", Toast.LENGTH_SHORT);
-            }
-        };
-        /////
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -130,7 +112,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         //Comprobamos la version de Android, en caso de ser 6.0 o superior, pedimos permisos.
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
@@ -147,21 +128,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             buildGoogleApiClient();
             mMap.setMyLocationEnabled(true); //Indicamos que queremos que se recoja nuestra ubicacion.
         }
-
-
         rectOptions = new PolylineOptions();
         mMap.moveCamera(CameraUpdateFactory.zoomTo(17));
-
-
-
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getApplicationContext(), "Me pulsiaste jaj :V", Toast.LENGTH_LONG).show();
-                return false;
-            }
-        });
-
     }
 
 
@@ -174,41 +142,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     cronometro.stop();
                     if (latLngList.size() > 1) {
                         //Mediante el SphericalUtil, se calcula la distancia total dada por los LatLng guardados.
-                        double distancia=SphericalUtil.computeLength(latLngList)/1000;//Dividido entre 100 para mostrar en km
+                        //distancia = SphericalUtil.computeLength(latLngList) / 1000;//Dividido entre 1000 para mostrar en km
                         Toast.makeText(getApplicationContext(),
-                                "Distancia recorrida: " + String.format("%.2f",distancia) +" kilómetros en "
-                                + cronometro.getText(),
+                                "Distancia recorrida: " + String.format("%.2f", distancia) + " kilómetros en "
+                                        + cronometro.getText(),
                                 Toast.LENGTH_LONG).show();
                     }
                     rutaIniciada = false;
                     btnRuta.setText("Iniciar Ruta");
                 } else {
                     if (vibracion || sonido) {
-                        if(avisoTxt.matches(regex)){
-                            aviso = Integer.parseInt(avisoTxt) ;
-                        }
-                        if(temporizadorTxt.matches(regex)){
-                            temporizador = Integer.parseInt(temporizadorTxt) ;
+                        if (temporizadorTxt.matches(regex)) {
+                            temporizador = Integer.parseInt(temporizadorTxt);
                         }
                     }
                     cronometro.setBase(SystemClock.elapsedRealtime());
                     cronometro.start();
-
-                    contador.start();
                     rutaIniciada = true;
                     btnRuta.setText("Finalizar Ruta");
-
-                    latLngList=new ArrayList<>();
-                    rectOptions = new PolylineOptions();
-                    /*if (!polylineList.isEmpty()){
-                        for (Polyline p: polylineList) {
-                            p.remove();
-                        }
-                        polylineList.clear();
-                    }*/
-
-
-
+                    if (latLngList.size() > 0) { //Comprobamos que se ha realizado anteriormente una ruta.
+                        mMap.clear();//Limpiamos el mapa de marcadores y/o lineas de recorrido.
+                    }
+                    latLngList.clear();
                 }
                 break;
         }
@@ -272,13 +227,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             rectOptions.add(latLng).width(10)
                     .color(Color.BLUE)
                     .geodesic(false);
-            Polyline polyline = mMap.addPolyline(rectOptions);
+            polyline = mMap.addPolyline(rectOptions);
 
-
-            double distancia=SphericalUtil.computeLength(latLngList)/1000;
-
-            textoDistancia.setText("DISTANCIA: "+ String.format("%.2f",distancia)+" km");
-
+            distancia = SphericalUtil.computeLength(latLngList) / 1000;
+            textoDistancia.setText("DISTANCIA: " + String.format("%.2f", distancia) + " km");
         }
     }
 

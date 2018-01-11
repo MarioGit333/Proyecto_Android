@@ -1,0 +1,31 @@
+servicioandroid@endrix.org -- mail
+servicioandroid -- contraseña
+servicioandroid -- dominio/nombre sitio web
+
+distancias -- nombre bbdd
+administrador -- usuario bbdd
+admin -- contraseña bbdd
+
+id4245359_distancias -- nombre REAL bbdd
+id4245359_administrador -- usuario REAL bbdd
+localhost
+
+-- Estructura de la bbdd
+
+CREATE TABLE distanciatiempo (
+     id serial primary key,
+     distancia NUMERIC(8,3),
+     tiempo NUMERIC(4),
+     nombre VARCHAR(30)
+    );
+	
+-- inserts
+
+insert into distanciatiempo (distancia, tiempo, nombre)
+VALUES (123.24, 55, 'Pedro'),
+		(50, 10, 'Luis');
+		
+--
+
+
+

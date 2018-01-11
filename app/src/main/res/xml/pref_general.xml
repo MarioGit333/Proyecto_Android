@@ -14,10 +14,6 @@
     <EditTextPreference android:title="Temporizador"
         android:defaultValue="30"
         android:key="tiempo"
-        android:summary="Minutos durante los que vas a estar haciendo ejercicio."/>
-    <EditTextPreference android:title="Aviso en tiempo"
-        android:defaultValue="15"
-        android:key="aviso"
-        android:summary="En caso de tener vibracion o sonido activados, se le notificara cada X minutos."/>
+        android:summary="Aviso por sonido y/o vibracion cada X minutos."/>
 
 </PreferenceScreen>
