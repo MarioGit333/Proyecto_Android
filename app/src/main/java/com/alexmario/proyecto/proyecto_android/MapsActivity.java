@@ -377,11 +377,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     urlConn.connect();
                     //Creo el Objeto JSON
                     JSONObject jsonParam = new JSONObject();
+                    int horas=0;
+                    int minutos=0;
+                    int segundos=0;
 
-                    int minutos=Integer.parseInt(strings[3].substring(0,2));
-                    int segundos=Integer.parseInt(strings[3].substring(3,5));
+                    if (strings[3].length()==7){
+                        horas=Integer.parseInt(strings[3].substring(0,1));
+                        minutos=Integer.parseInt(strings[3].substring(2,4));
+                        segundos=Integer.parseInt(strings[3].substring(5,7));
+                    }else{
+                        minutos=Integer.parseInt(strings[3].substring(0,2));
+                        segundos=Integer.parseInt(strings[3].substring(3,5));
+                    }
+
                     if (minutos>0)
-                        segundos+=minutos*60;
+                        segundos+=(minutos*60)+(horas*3600);
 
                     jsonParam.put("distancia", Double.parseDouble(strings[2]));
                     jsonParam.put("tiempo", segundos);

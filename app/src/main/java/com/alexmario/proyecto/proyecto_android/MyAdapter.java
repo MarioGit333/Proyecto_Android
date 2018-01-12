@@ -22,15 +22,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     // you provide access to all the views for a data item in a view holder
     public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView txtHeader;
-        public TextView txtFooter;
+        public TextView txtHeader,txtFooter,txtFecha;
         public View layout;
 
         public ViewHolder(View v) {
             super(v);
             layout = v;
-            txtHeader = (TextView) v.findViewById(R.id.txtHeader);
-            txtFooter = (TextView) v.findViewById(R.id.txtFooter);
+            txtHeader =  v.findViewById(R.id.txtHeader);
+            txtFooter =  v.findViewById(R.id.txtFooter);
+            txtFecha = v.findViewById(R.id.txtFecha);
         }
     }
 
@@ -67,15 +67,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // - replace the contents of the view with that element
         final String distancia = values.get(position).getDistancia();
         final String tiempo = values.get(position).getTiempo();
-        holder.txtHeader.setText(distancia);
-        holder.txtHeader.setOnClickListener(new OnClickListener() {
+        final String fecha = values.get(position).getFecha();
+
+        holder.txtHeader.setText("Distancia: "+distancia+" km");
+        /*holder.txtHeader.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 remove(position);
             }
-        });
+        });*/
 
-        holder.txtFooter.setText(tiempo);
+        holder.txtFecha.setText("Fecha: "+fecha.substring(0,16));
+
+        holder.txtFooter.setText("Duración: "+tiempo);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

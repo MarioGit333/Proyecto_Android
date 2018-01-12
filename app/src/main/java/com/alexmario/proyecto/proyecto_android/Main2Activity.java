@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,19 +48,12 @@ public class Main2Activity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
-
-
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
-        // use this setting to
-        // improve performance if you know that changes
-        // in content do not change the layout size
-        // of the RecyclerView
+
         recyclerView.setHasFixedSize(true);
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-
-
 
         String IP = "http://servicioandroid.000webhostapp.com";
         // Rutas de los Web Services
@@ -138,20 +132,31 @@ public class Main2Activity extends AppCompatActivity {
 
                                 int segundos=Integer.parseInt(rutasJSON.getJSONObject(i).getString("tiempo"));
                                 int minutos=0;
+                                int horas=0;
+                                if (segundos>=3600){
+                                    horas=segundos/3600;
+                                    segundos=segundos%3600;
+                                }
                                 if (segundos>=60){
                                     minutos=segundos/60;
                                     segundos=segundos%60;
                                 }
                                 String tiempo;
+                                String fecha=rutasJSON.getJSONObject(i).getString("fecha");
+                                String muestraMinutos;
+                                if (minutos<10)
+                                    muestraMinutos="0"+minutos;
+                                else
+                                    muestraMinutos=""+minutos;
+
                                 if (segundos<10){
-                                    tiempo=minutos+":0"+segundos;
+                                    tiempo=horas+":"+muestraMinutos+":0"+segundos;
                                 }else{
-                                    tiempo=minutos+":"+segundos;
+                                    tiempo=horas+":"+muestraMinutos+":"+segundos;
                                 }
 
-
                                 Ruta ruta=new Ruta(rutasJSON.getJSONObject(i).getString("distancia"),
-                                        tiempo);
+                                        tiempo,fecha);
 
                                 rutas.add(ruta);
 
