@@ -4,13 +4,15 @@ package com.alexmario.proyecto.proyecto_android;
  * Created by Alex on 11/01/2018.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.List;
 
 public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ViewHolder> {
     private List<Usuario> values;
@@ -20,7 +22,7 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ViewHo
     // you provide access to all the views for a data item in a view holder
     public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView txtHeader,txtFooter,txtFecha;
+        public TextView txtHeader,txtFooter;
         public View layout;
 
         public ViewHolder(View v) {
@@ -51,7 +53,7 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ViewHo
     public UsuariosAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View v = inflater.inflate(R.layout.item_list, parent, false);
+        View v = inflater.inflate(R.layout.item_list_user, parent, false);
         // set the view's size, margins, paddings and layout parameters
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -73,7 +75,6 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ViewHo
                 remove(position);
             }
         });*/
-
 
         holder.txtFooter.setText(numero);
     }
