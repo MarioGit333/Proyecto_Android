@@ -23,6 +23,8 @@ import java.util.List;
 
 public class Main3Activity extends AppCompatActivity {
 
+    private ObtenerWebService hiloconexion;
+    private List<String[]> contactos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +34,9 @@ public class Main3Activity extends AppCompatActivity {
     }
 
     private void mostrarUsuariosApp() {
+        ObtenerWebService hiloconexion = new ObtenerWebService();
+        hiloconexion.execute();
+
         String[] projeccion = new String[]{ContactsContract.Data._ID, ContactsContract.Data.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER};
         String selectionClause = ContactsContract.Data.MIMETYPE + "='" +
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE + "' AND "
@@ -47,6 +52,14 @@ public class Main3Activity extends AppCompatActivity {
 
 
         while (c.moveToNext()) {
+            for(String[] s : contactos){
+                if(!c.getString(2).equals(s[2])){
+                    //descartado.
+                    s[0] = null;
+                    s[1] = null;
+                    s[2] = null;
+                }
+            }
         }
         c.close();
     }
@@ -85,9 +98,9 @@ public class Main3Activity extends AppCompatActivity {
                     if (resultJSON == "1") {      // hay alumnos a mostrar
                         JSONArray alumnosJSON = respuestaJSON.getJSONArray("alumnos");   // estado es el nombre del campo en el JSON
                         for (int i = 0; i < alumnosJSON.length(); i++) {
-                            contacto[0] = alumnosJSON.getJSONObject(i).getString("idalumno");
+                            contacto[0] = alumnosJSON.getJSONObject(i).getString("id");
                             contacto[1] = alumnosJSON.getJSONObject(i).getString("nombre");
-                            contacto[2] = alumnosJSON.getJSONObject(i).getString("direccion") + "\n";
+                            contacto[2] = alumnosJSON.getJSONObject(i).getString("telefono") + "\n";
                             datos.add(contacto);
                         }
                     }
@@ -110,7 +123,8 @@ public class Main3Activity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<String[]> s) {
-            //super.onPostExecute(s);
+            super.onPostExecute(s);
+            contactos = s;
         }
 
         @Override
