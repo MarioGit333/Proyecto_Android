@@ -126,7 +126,7 @@ public class Main2Activity extends AppCompatActivity {
                         if (resultJSON.equals("1")) {      // hay rutas a mostrar
 
                             JSONArray rutasJSON = respuestaJSON.getJSONArray("distanciastiempo");   // estado es el nombre del campo en el JSON
-                            System.out.println(rutasJSON.length());
+
                             for (int i = 0; i < rutasJSON.length(); i++) {
 
 
