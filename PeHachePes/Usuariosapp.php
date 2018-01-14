@@ -41,20 +41,20 @@ class Usuariosapp
      * @param $idAlumno Identificador del alumno
      * @return mixed
      */
-    public static function getById($idAlumno)
+    public static function getById($telefono)
     {
         // Consulta de la tabla Alumnos
         $consulta = "SELECT id,
                             nombre,
                             telefono
                             FROM usuariosapp
-                            WHERE id = ?";
+                            WHERE telefono = ?";
 
         try {
             // Preparar sentencia
             $comando = Database::getInstance()->getDb()->prepare($consulta);
             // Ejecutar sentencia preparada
-            $comando->execute(array($idAlumno));
+            $comando->execute(array($telefono));
             // Capturar primera fila del resultado
             $row = $comando->fetch(PDO::FETCH_ASSOC);
             return $row;
