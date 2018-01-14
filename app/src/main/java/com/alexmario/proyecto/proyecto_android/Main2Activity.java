@@ -4,12 +4,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -18,18 +16,12 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +32,7 @@ public class Main2Activity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<Ruta> rutas=new ArrayList<>();
+    private ArrayList<Ruta> rutas = new ArrayList<>();
 
 
     @Override
@@ -76,7 +68,7 @@ public class Main2Activity extends AppCompatActivity {
     }
 
 
-    public class ObtenerWebService extends AsyncTask<String,Void,String> {
+    public class ObtenerWebService extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
@@ -128,35 +120,33 @@ public class Main2Activity extends AppCompatActivity {
                             JSONArray rutasJSON = respuestaJSON.getJSONArray("distanciastiempo");   // estado es el nombre del campo en el JSON
 
                             for (int i = 0; i < rutasJSON.length(); i++) {
-
-
-                                int segundos=Integer.parseInt(rutasJSON.getJSONObject(i).getString("tiempo"));
-                                int minutos=0;
-                                int horas=0;
-                                if (segundos>=3600){
-                                    horas=segundos/3600;
-                                    segundos=segundos%3600;
+                                int segundos = Integer.parseInt(rutasJSON.getJSONObject(i).getString("tiempo"));
+                                int minutos = 0;
+                                int horas = 0;
+                                if (segundos >= 3600) {
+                                    horas = segundos / 3600;
+                                    segundos = segundos % 3600;
                                 }
-                                if (segundos>=60){
-                                    minutos=segundos/60;
-                                    segundos=segundos%60;
+                                if (segundos >= 60) {
+                                    minutos = segundos / 60;
+                                    segundos = segundos % 60;
                                 }
                                 String tiempo;
-                                String fecha=rutasJSON.getJSONObject(i).getString("fecha");
+                                String fecha = rutasJSON.getJSONObject(i).getString("fecha");
                                 String muestraMinutos;
-                                if (minutos<10)
-                                    muestraMinutos="0"+minutos;
+                                if (minutos < 10)
+                                    muestraMinutos = "0" + minutos;
                                 else
-                                    muestraMinutos=""+minutos;
+                                    muestraMinutos = "" + minutos;
 
-                                if (segundos<10){
-                                    tiempo=horas+":"+muestraMinutos+":0"+segundos;
-                                }else{
-                                    tiempo=horas+":"+muestraMinutos+":"+segundos;
+                                if (segundos < 10) {
+                                    tiempo = horas + ":" + muestraMinutos + ":0" + segundos;
+                                } else {
+                                    tiempo = horas + ":" + muestraMinutos + ":" + segundos;
                                 }
 
-                                Ruta ruta=new Ruta(rutasJSON.getJSONObject(i).getString("distancia"),
-                                        tiempo,fecha);
+                                Ruta ruta = new Ruta(rutasJSON.getJSONObject(i).getString("distancia"),
+                                        tiempo, fecha);
 
                                 rutas.add(ruta);
 

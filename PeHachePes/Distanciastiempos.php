@@ -20,7 +20,7 @@ class Distanciastiempos
      */
     public static function getAll()
     {
-        $consulta = "SELECT * FROM distanciatiempo";
+        $consulta = "SELECT * FROM distanciatiempo ORDER BY distancia DESC, tiempo";
         try {
             // Preparar sentencia
             $comando = Database::getInstance()->getDb()->prepare($consulta);
