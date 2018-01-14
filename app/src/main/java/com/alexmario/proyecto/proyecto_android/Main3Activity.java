@@ -106,8 +106,7 @@ public class Main3Activity extends AppCompatActivity {
     }
 
     private List<Usuario> mostrarUsuariosApp() {
-        ObtenerWebService hiloconexion = new ObtenerWebService();
-        hiloconexion.execute();
+
 
         List<Usuario> listaUsuarios=new ArrayList<>();
 
@@ -136,17 +135,6 @@ public class Main3Activity extends AppCompatActivity {
             listaUsuarios.add(u);
         }
 
-        /*while (c.moveToNext()) {
-
-            for(String[] s : contactos){
-                if(!c.getString(2).equals(s[2])){
-                    //descartado.
-                    s[0] = "/";
-                    s[1] = "/";
-                    s[2] = "/";
-                }
-            }
-        }*/
         c.close();
         return listaUsuarios;
     }
@@ -162,8 +150,8 @@ public class Main3Activity extends AppCompatActivity {
             List<String[]> datos = new ArrayList<>();
             List<Usuario> usuarios = new ArrayList<>();
             List<Usuario> contactos = mostrarUsuariosApp();
-            //Toast.makeText(getApplicationContext(),usuarios.size(),Toast.LENGTH_LONG).show();
-            Log.d("Prueba 1", contactos.size()+"");
+
+
             try {
                 url = new URL(cadena);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection(); //Abrir la conexión
@@ -189,7 +177,7 @@ public class Main3Activity extends AppCompatActivity {
                     JSONObject respuestaJSON = new JSONObject(result.toString());   //Creo un JSONObject a partir del StringBuilder pasado a cadena
                     //Accedemos al vector de resultados
                     String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
-                    if (resultJSON == "1") {      // hay alumnos a mostrar
+                         // hay alumnos a mostrar
                         JSONArray alumnosJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
                         for (int i = 0; i < alumnosJSON.length(); i++) {
                             contacto[0] = alumnosJSON.getJSONObject(i).getString("id");
@@ -198,20 +186,19 @@ public class Main3Activity extends AppCompatActivity {
                             //datos.add(contacto);
                             Usuario u=new Usuario(contacto);
                             boolean esUsuario=false;
-                            usuarios.add(u);
+
+
                             for (Usuario user: contactos){
                                 if (user.getNumero().equals(u.getNumero())){
                                     esUsuario=true;
+                                    usuarios.add(user);
                                 }
-                                usuarios.add(user);
                             }
-                            //if (esUsuario)
-
                         }
-                    }
-                    usuarios.add(new Usuario("a","a"));
 
-                    List<Usuario> input = contactos;
+
+
+                    List<Usuario> input = usuarios;
                     mAdapter = new UsuariosAdapter(input);
                 }
 
