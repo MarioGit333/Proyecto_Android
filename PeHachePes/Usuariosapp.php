@@ -48,7 +48,7 @@ class Usuariosapp
                             nombre,
                             telefono
                             FROM usuariosapp
-                            WHERE telefono = ?";
+                            WHERE telefono LIKE %?%";
 
         try {
             // Preparar sentencia
