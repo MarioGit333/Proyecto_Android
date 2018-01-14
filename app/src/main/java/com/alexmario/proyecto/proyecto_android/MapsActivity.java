@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -73,18 +75,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient mGoogleApiClient;
     private Location mUltimaUbicacion;
     private Marker mMarcadorActual;
+    private SoundPool soundPool;
+    private int carga;
     private PolylineOptions rectOptions;
     private Polyline polyline;
     private boolean rutaIniciada, sonido, vibracion;
     private SharedPreferences prefs;
-    private double distancia;
     private Vibrator vibrador;
     private ArrayList<LatLng> latLngList;
     private LatLng latLng;
     private ObtenerWebService hiloConexion;
     private Toast toast;
-    private String regex, temporizadorTxt;
-    private int temporizador;
+    private String regex, temporizadorTxt, minutos;
+    private double temporizador, distancia, minutoAux;
     private Chronometer cronometro;
     private TextView textoDistancia;
     private long pausaCronometro;
@@ -104,23 +107,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        minutoAux = 0;
         rutaIniciada = false;
         regex = "\\d+";
-        temporizador = 30;
         latLngList = new ArrayList<>();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         vibrador = (Vibrator) (getSystemService(Service.VIBRATOR_SERVICE));
         cronometro = findViewById(R.id.chronometer2);
         textoDistancia = findViewById(R.id.distanciaView);
-
-
+        soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
+        carga = soundPool.load(this,R.raw.stairs,1);
         btnRuta = findViewById(R.id.btnRuta);
 
 
         btnRuta.setOnClickListener(this);
         sonido = prefs.getBoolean("sonido", false);
-        vibracion = prefs.getBoolean("vibracion", false);
-        temporizadorTxt = prefs.getString("temporizador", "30");
+        vibracion = prefs.getBoolean("vibracion", true);
+        temporizadorTxt = prefs.getString("tiempo", "15");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -185,11 +188,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     rutaIniciada = false;
                     btnRuta.setText("Iniciar Ruta");
                 } else {
-                    if (vibracion || sonido) {
-                        if (temporizadorTxt.matches(regex)) {
-                            temporizador = Integer.parseInt(temporizadorTxt);
-                        }
-                    }
                     cronometro.setBase(SystemClock.elapsedRealtime());
                     cronometro.start();
                     rutaIniciada = true;
@@ -202,7 +200,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
     }
-
+    private void vibrarOSonar(){
+        if(vibracion || sonido)
+        if(temporizadorTxt.matches(regex)){
+            temporizador = Double.parseDouble(temporizadorTxt);
+        }
+        minutos = (String)cronometro.getText().subSequence(0,2);
+        if(Double.parseDouble(minutos) % temporizador == 0 && Double.parseDouble(minutos) != minutoAux){
+            if(vibracion) {
+                vibrador.vibrate(500);
+            }
+            if(sonido){
+                soundPool.play(carga, 1,1, 0,0,1);
+            }
+            minutoAux = Double.parseDouble(minutos);
+        }
+    }
     protected synchronized void buildGoogleApiClient() { //necesitamos la api de Google para ciertas funciones con los mapas.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)   //En este caso, necesitamos la api de google para recoger nuestra ubicacion
@@ -266,6 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             distancia = SphericalUtil.computeLength(latLngList) / 1000;
             textoDistancia.setText("DISTANCIA: " + String.format("%.2f", distancia) + " km");
         }
+        vibrarOSonar();
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
