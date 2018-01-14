@@ -6,13 +6,10 @@
     android:layout_height="match_parent"
     tools:context="com.alexmario.proyecto.proyecto_android.Main3Activity">
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="227dp"
-        android:text="PANTALLA 3"
-        app:layout_constraintEnd_toEndOf="parent"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_contactos"
+        android:layout_width="368dp"
+        android:layout_height="211dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>
