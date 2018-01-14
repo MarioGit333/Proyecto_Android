@@ -31,5 +31,14 @@ servicioandroid
 administrador
 --
 
+--Tabla usuarios que usaran nuestra app.
+CREATE TABLE usuariosapp (
+    id VARCHAR(45) primary key,
+    nombre VARCHAR(70),
+    telefono VARCHAR(14), /*Por si acaso hay +XX del prefijo. */
+    tipo VARCHAR(20)
+    );
+
+	
 
 
