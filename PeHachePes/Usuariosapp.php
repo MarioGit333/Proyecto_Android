@@ -46,10 +46,9 @@ class Usuariosapp
         // Consulta de la tabla Alumnos
         $consulta = "SELECT id,
                             nombre,
-                            telefono,
-							tipo
-                             FROM usuariosapp
-                             WHERE id = ?";
+                            telefono
+                            FROM usuariosapp
+                            WHERE id = ?";
 
         try {
             // Preparar sentencia
@@ -88,17 +87,15 @@ class Usuariosapp
     public static function insert(
         $id,
         $nombre,
-		$telefono,
-		$tipo
+		$telefono
     )
     {
         // Sentencia INSERT
         $comando = "INSERT INTO usuariosapp ( " .
             "id," .
 			 "nombre," .
-			 "telefono," .
-            " tipo)" .
-            " VALUES( ?,?,?,?)";
+			 "telefono)" .
+            " VALUES( ?,?,?)";
 
         // Preparar la sentencia
         $sentencia = Database::getInstance()->getDb()->prepare($comando);
@@ -107,8 +104,7 @@ class Usuariosapp
             array(
                 $id,
                 $nombre,
-				$telefono,
-				$tipo
+				$telefono
             )
         );
 

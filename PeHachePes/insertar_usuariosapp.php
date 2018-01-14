@@ -14,8 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $retorno = Usuariosapp::insert(
         $body['id'],
 		$body['nombre'],
-		$body['telefono'],
-        $body['tipo']);
+		$body['telefono']);
 
     if ($retorno) {
         $json_string = json_encode(array("estado" => 1,"mensaje" => "Creacion correcta"));
