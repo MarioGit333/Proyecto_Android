@@ -55,6 +55,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
             String tel,name,id;
             tel=telefono.getText().toString();
+            tel=tel.substring(0,3)+" "+tel.substring(3,5)+" "+tel.substring(5,7)+" "+tel.substring(7,9);
             name=nombre.getText().toString();
             id = Settings.Secure.getString(this.getContentResolver(),
                     Settings.Secure.ANDROID_ID);
