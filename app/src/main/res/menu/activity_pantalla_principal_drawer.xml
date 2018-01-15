@@ -11,11 +11,11 @@
         <item
             android:id="@+id/pantalla2"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Ver últimas rutas" />
+            android:title="Ver rutas" />
         <item
             android:id="@+id/pantalla3"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Pantalla 3" />
+            android:title="Contactos" />
         <item
             android:id="@+id/pantalla4"
             android:icon="@drawable/ic_menu_manage"

@@ -55,8 +55,6 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final String nombre = values.get(position).getNombre();
         final String numero = values.get(position).getNumero();
-
-
         holder.txtHeader.setText(nombre);
         holder.txtFooter.setText(numero);
     }
