@@ -116,7 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         cronometro = findViewById(R.id.chronometer2);
         textoDistancia = findViewById(R.id.distanciaView);
         soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
-        carga = soundPool.load(this,R.raw.stairs,1);
+        carga = soundPool.load(this, R.raw.stairs, 1);
         btnRuta = findViewById(R.id.btnRuta);
 
 
@@ -200,22 +200,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
     }
-    private void vibrarOSonar(){
-        if(vibracion || sonido)
-        if(temporizadorTxt.matches(regex)){
-            temporizador = Double.parseDouble(temporizadorTxt);
-        }
-        minutos = (String)cronometro.getText().subSequence(0,2);
-        if(Double.parseDouble(minutos) % temporizador == 0 && Double.parseDouble(minutos) != minutoAux){
-            if(vibracion) {
+
+    private void vibrarOSonar() {
+        if (vibracion || sonido)
+            if (temporizadorTxt.matches(regex)) {
+                temporizador = Double.parseDouble(temporizadorTxt);
+            }
+        minutos = (String) cronometro.getText().subSequence(0, 2);
+        if (Double.parseDouble(minutos) % temporizador == 0 && Double.parseDouble(minutos) != minutoAux) {
+            if (vibracion) {
                 vibrador.vibrate(500);
             }
-            if(sonido){
-                soundPool.play(carga, 1,1, 0,0,1);
+            if (sonido) {
+                soundPool.play(carga, 1, 1, 0, 0, 1);
             }
             minutoAux = Double.parseDouble(minutos);
         }
     }
+
     protected synchronized void buildGoogleApiClient() { //necesitamos la api de Google para ciertas funciones con los mapas.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)   //En este caso, necesitamos la api de google para recoger nuestra ubicacion
@@ -283,7 +285,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
-
     //Comprobacion de permisos.
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -351,6 +352,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public class ObtenerWebService extends AsyncTask<String, Void, String> {
         String devuelve = "";
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -391,21 +393,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     urlConn.connect();
                     //Creo el Objeto JSON
                     JSONObject jsonParam = new JSONObject();
-                    int horas=0;
-                    int minutos=0;
-                    int segundos=0;
+                    int horas = 0;
+                    int minutos = 0;
+                    int segundos = 0;
 
-                    if (strings[3].length()==7){
-                        horas=Integer.parseInt(strings[3].substring(0,1));
-                        minutos=Integer.parseInt(strings[3].substring(2,4));
-                        segundos=Integer.parseInt(strings[3].substring(5,7));
-                    }else{
-                        minutos=Integer.parseInt(strings[3].substring(0,2));
-                        segundos=Integer.parseInt(strings[3].substring(3,5));
+                    if (strings[3].length() == 7) {
+                        horas = Integer.parseInt(strings[3].substring(0, 1));
+                        minutos = Integer.parseInt(strings[3].substring(2, 4));
+                        segundos = Integer.parseInt(strings[3].substring(5, 7));
+                    } else {
+                        minutos = Integer.parseInt(strings[3].substring(0, 2));
+                        segundos = Integer.parseInt(strings[3].substring(3, 5));
                     }
 
-                    if (minutos>0)
-                        segundos+=(minutos*60)+(horas*3600);
+                    if (minutos > 0)
+                        segundos += (minutos * 60) + (horas * 3600);
 
                     jsonParam.put("distancia", Double.parseDouble(strings[2]));
                     jsonParam.put("tiempo", segundos);

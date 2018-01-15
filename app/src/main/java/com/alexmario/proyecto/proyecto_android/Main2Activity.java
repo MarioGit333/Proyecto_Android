@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +26,6 @@ import java.util.List;
 
 public class Main2Activity extends AppCompatActivity {
 
-    TextView resultado;
     private ObtenerWebService hiloConexion;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -43,7 +41,6 @@ public class Main2Activity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
         recyclerView.setHasFixedSize(true);
-        // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -67,7 +64,6 @@ public class Main2Activity extends AppCompatActivity {
         return true;
     }
 
-
     public class ObtenerWebService extends AsyncTask<String, Void, String> {
 
         @Override
@@ -76,49 +72,32 @@ public class Main2Activity extends AppCompatActivity {
             String cadena = params[0];
             URL url = null; // Url de donde queremos obtener información
             String devuelve = "";
-
-
             if (params[1] == "1") {    // Consulta de todos las rutas
-
                 try {
                     url = new URL(cadena);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection(); //Abrir la conexión
                     connection.setRequestProperty("User-Agent", "Mozilla/5.0" +
                             " (Linux; Android 1.5; es-ES) Ejemplo HTTP");
                     //connection.setHeader("content-type", "application/json");
-
                     int respuesta = connection.getResponseCode();
-
                     StringBuilder result = new StringBuilder();
-
                     if (respuesta == HttpURLConnection.HTTP_OK) {
-
-
                         InputStream in = new BufferedInputStream(connection.getInputStream());  // preparo la cadena de entrada
-
                         BufferedReader reader = new BufferedReader(new InputStreamReader(in));  // la introduzco en un BufferedReader
-
                         // El siguiente proceso lo hago porque el JSONOBject necesita un String y tengo
                         // que tranformar el BufferedReader a String. Esto lo hago a traves de un
                         // StringBuilder.
-
                         String line;
                         while ((line = reader.readLine()) != null) {
                             result.append(line);        // Paso toda la entrada al StringBuilder
                         }
-
                         //Creamos un objeto JSONObject para poder acceder a los atributos (campos) del objeto.
                         JSONObject respuestaJSON = new JSONObject(result.toString());   //Creo un JSONObject a partir del StringBuilder pasado a cadena
                         //Accedemos al vector de resultados
-
                         String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
-
-
                         System.out.println(resultJSON);
                         if (resultJSON.equals("1")) {      // hay rutas a mostrar
-
                             JSONArray rutasJSON = respuestaJSON.getJSONArray("distanciastiempo");   // estado es el nombre del campo en el JSON
-
                             for (int i = 0; i < rutasJSON.length(); i++) {
                                 int segundos = Integer.parseInt(rutasJSON.getJSONObject(i).getString("tiempo"));
                                 int minutos = 0;
@@ -147,24 +126,14 @@ public class Main2Activity extends AppCompatActivity {
 
                                 Ruta ruta = new Ruta(rutasJSON.getJSONObject(i).getString("distancia"),
                                         tiempo, fecha);
-
                                 rutas.add(ruta);
-
                             }
-
                             List<Ruta> input = rutas;
-
                             mAdapter = new MyAdapter(input);
-
-
                         } else if (resultJSON.equals("2")) {
                             devuelve = "No hay rutas";
                         }
-
-
                     }
-
-
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -172,10 +141,7 @@ public class Main2Activity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 return devuelve;
-
-
             }
             return "1";
         }

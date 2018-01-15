@@ -13,9 +13,9 @@ public class Usuario {
         this.numero = numero;
     }
 
-    public Usuario(String[] contacto){
-        nombre=contacto[1];
-        numero=contacto[2];
+    public Usuario(String[] contacto) {
+        nombre = contacto[1];
+        numero = contacto[2];
     }
 
     public String getNombre() {

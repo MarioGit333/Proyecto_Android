@@ -10,8 +10,8 @@ public class Ruta {
     private String fecha;
 
     public Ruta(String distancia, String tiempo) {
-        this.distancia = " Distancia: "+distancia;
-        this.tiempo = " Tiempo: "+tiempo;
+        this.distancia = " Distancia: " + distancia;
+        this.tiempo = " Tiempo: " + tiempo;
     }
 
     public Ruta(String distancia, String tiempo, String fecha) {
