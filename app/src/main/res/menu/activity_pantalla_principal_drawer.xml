@@ -11,27 +11,19 @@
         <item
             android:id="@+id/pantalla2"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Ver rutas" />
+            android:title="Estadisticas" />
         <item
             android:id="@+id/pantalla3"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Contactos" />
-        <item
-            android:id="@+id/pantalla4"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Pantalla 4" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="Configuracion">
         <menu>
             <item
                 android:id="@+id/settings"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Settings" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:icon="@mipmap/ic_settings"
+                android:title="Opciones" />
         </menu>
     </item>
 
