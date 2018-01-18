@@ -8,10 +8,10 @@ require 'Usuariosapp.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
-    if (isset($_GET['telefono'])) {
+    if (isset($_GET['id'])) {
 
         // Obtener par�metro idalumno
-        $parametro = $_GET['telefono'];
+        $parametro = $_GET['id'];
 
         // Tratar retorno
         $retorno = Usuariosapp::getById($parametro);
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         if ($retorno) {
 
             $alumno["estado"] = 1;		// cambio "1" a 1 porque no coge bien la cadena.
-            $alumno["telefono"] = $retorno;
+            $alumno["usuariosapp"] = $retorno;
             // Enviar objeto json del alumno
             print json_encode($alumno);
         } else {
