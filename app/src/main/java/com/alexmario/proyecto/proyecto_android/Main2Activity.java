@@ -8,6 +8,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +53,36 @@ public class Main2Activity extends AppCompatActivity {
             hiloConexion = new ObtenerWebService();
             hiloConexion.execute(GETRUTAS, "1");
         }
+
+
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.opciones_array,
+                android.R.layout.simple_spinner_item);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (position==0){
+                    //Mostrar rutas del usuario
+                }else{
+                    //Mostrar Ranking
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //Another interface callback
+            }
+        });
+
+        //spinner.setOnItemSelectedListener();
+
     }
 
     private boolean hayConexion(Context context) {
@@ -58,6 +94,10 @@ public class Main2Activity extends AppCompatActivity {
         }
         return true;
     }
+
+
+
+
 
     public class ObtenerWebService extends AsyncTask<String, Void, String> {
         @Override

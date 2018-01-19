@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -393,6 +394,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                     if (minutos > 0)
                         segundos += (minutos * 60) + (horas * 3600);
+                    String id = Settings.Secure.getString(getContentResolver(),
+                            Settings.Secure.ANDROID_ID);
                     jsonParam.put("distancia", Double.parseDouble(strings[2]));
                     jsonParam.put("tiempo", segundos);
                     // Envio los parámetros post.

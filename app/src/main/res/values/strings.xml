@@ -32,6 +32,11 @@
         <item>-1</item>
     </string-array>
 
+    <string-array name="opciones_array">
+        <item>Mostrar tus rutas</item>
+        <item>Mostrar Ranking</item>
+    </string-array>
+
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
 
