@@ -28,48 +28,42 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SignUpActivity extends AppCompatActivity implements View.OnClickListener{
-
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
     Button boton;
-    EditText nombre,telefono;
+    EditText nombre, telefono;
     private SignUpActivity.ObtenerWebService hiloConexion;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
-        boton=findViewById(R.id.botonRegistro);
-        telefono=findViewById(R.id.telefono);
-        nombre=findViewById(R.id.nombre);
-
+        boton = findViewById(R.id.botonRegistro);
+        telefono = findViewById(R.id.telefono);
+        nombre = findViewById(R.id.nombre);
         boton.setOnClickListener(this);
-
     }
 
     @Override
     public void onClick(View view) {
-        if (nombre.getText().length()!=0 && telefono.getText().length()==9){
+        if (nombre.getText().length() != 0 && telefono.getText().length() == 9) {
             getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
                     .putBoolean("isFirstRun", false).commit();
             startActivity(new Intent(this, PantallaPrincipal.class));
-
-            String tel,name,id;
-            tel=telefono.getText().toString();
-            tel=tel.substring(0,3)+" "+tel.substring(3,5)+" "+tel.substring(5,7)+" "+tel.substring(7,9);
-            name=nombre.getText().toString();
+            String tel, name, id;
+            tel = telefono.getText().toString();
+            tel = tel.substring(0, 3) + " " + tel.substring(3, 5) + " " + tel.substring(5, 7) + " " + tel.substring(7, 9);
+            name = nombre.getText().toString();
             id = Settings.Secure.getString(this.getContentResolver(),
                     Settings.Secure.ANDROID_ID);
-
             if (hayConexion(getApplicationContext())) {//Si estamos conectados a internet
                 hiloConexion = new SignUpActivity.ObtenerWebService();
                 hiloConexion.execute(
                         "http://servicioandroid.000webhostapp.com/insertar_usuariosapp.php",
-                        "1", id, name,tel);
+                        "1", id, name, tel);
             }
-
-        }else{
+        } else {
             Toast.makeText(this,
-                    "Debes introducir un usuario y número correcto",Toast.LENGTH_LONG).show();
+                    "Debes introducir un usuario y número correcto", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -86,6 +80,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     public class ObtenerWebService extends AsyncTask<String, Void, String> {
         String devuelve = "";
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -110,7 +105,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         protected String doInBackground(String... strings) {
             if (strings[1] == "1") { //insercion
                 URL url;
-
                 try {
                     url = new URL(strings[0]);
                     HttpURLConnection urlConn;
@@ -126,8 +120,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     urlConn.connect();
                     //Creo el Objeto JSON
                     JSONObject jsonParam = new JSONObject();
-
-
                     jsonParam.put("id", strings[2]);
                     jsonParam.put("nombre", strings[3]);
                     jsonParam.put("telefono", strings[4]);
@@ -138,34 +130,23 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     writer.write(jsonParam.toString());
                     writer.flush();
                     writer.close();
-
                     int respuesta = urlConn.getResponseCode();
-
-
                     StringBuilder result = new StringBuilder();
-
                     if (respuesta == HttpURLConnection.HTTP_OK) {
-
                         String line;
                         BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
                         while ((line = br.readLine()) != null) {
                             result.append(line);
-                            //response+=line;
                         }
-
                         //Creamos un objeto JSONObject para poder acceder a los atributos (campos) del objeto.
                         JSONObject respuestaJSON = new JSONObject(result.toString());   //Creo un JSONObject a partir del StringBuilder pasado a cadena
                         //Accedemos al vector de resultados
-
                         String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
-
                         if (resultJSON == "1") {      // hay una ruta que mostrar
                             devuelve = "Ruta insertada correctamente";
-
                         } else if (resultJSON == "2") {
                             devuelve = "La ruta no pudo insertarse";
                         }
-
                     }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();

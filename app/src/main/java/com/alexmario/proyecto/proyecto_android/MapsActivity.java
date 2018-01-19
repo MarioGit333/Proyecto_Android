@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.TextView;
@@ -62,7 +63,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, View.OnClickListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -79,23 +79,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int carga;
     private PolylineOptions rectOptions;
     private Polyline polyline;
-    private boolean rutaIniciada, sonido, vibracion;
+    private boolean rutaIniciada, sonido, vibracion, pausada;
     private SharedPreferences prefs;
     private Vibrator vibrador;
     private ArrayList<LatLng> latLngList;
     private LatLng latLng;
     private ObtenerWebService hiloConexion;
-    private Toast toast;
     private String regex, temporizadorTxt, minutos;
     private double temporizador, distancia, minutoAux;
     private Chronometer cronometro;
     private TextView textoDistancia;
-    private long pausaCronometro;
-    private List<Polyline> polylineList;
 
     @Override
     protected void onPause() {
         super.onPause();
+        pausada = true;
         //Detiene las actualizaciones del mapa cuando la activity no esta activa.
         if (mGoogleApiClient != null) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -103,12 +101,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if(pausada){
+            Toast.makeText(this, "RESUMIENDO", Toast.LENGTH_LONG).show();
+           buildGoogleApiClient();
+           pausada = false;
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //Forzamos a que la pantalla no se apague.
         minutoAux = 0;
         rutaIniciada = false;
+        pausada = false;
         regex = "\\d+";
         latLngList = new ArrayList<>();
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -116,15 +125,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         cronometro = findViewById(R.id.chronometer2);
         textoDistancia = findViewById(R.id.distanciaView);
         soundPool = new SoundPool(8, AudioManager.STREAM_MUSIC, 0);
-        carga = soundPool.load(this,R.raw.stairs,1);
+        carga = soundPool.load(this, R.raw.stairs, 1);
         btnRuta = findViewById(R.id.btnRuta);
-
-
         btnRuta.setOnClickListener(this);
         sonido = prefs.getBoolean("sonido", false);
         vibracion = prefs.getBoolean("vibracion", true);
         temporizadorTxt = prefs.getString("tiempo", "15");
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -167,7 +173,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onClick(View view) {
         switch (view.getId()) { //Cambiar el tipo de mapa en funcion del boton pulsado.
-
             case R.id.btnRuta:
                 if (rutaIniciada) {
                     cronometro.stop();
@@ -200,22 +205,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
     }
-    private void vibrarOSonar(){
-        if(vibracion || sonido)
-        if(temporizadorTxt.matches(regex)){
-            temporizador = Double.parseDouble(temporizadorTxt);
-        }
-        minutos = (String)cronometro.getText().subSequence(0,2);
-        if(Double.parseDouble(minutos) % temporizador == 0 && Double.parseDouble(minutos) != minutoAux){
-            if(vibracion) {
+
+    private void vibrarOSonar() {
+        if (vibracion || sonido)
+            if (temporizadorTxt.matches(regex)) {
+                temporizador = Double.parseDouble(temporizadorTxt);
+            }
+        minutos = (String) cronometro.getText().subSequence(0, 2);
+        if (Double.parseDouble(minutos) % temporizador == 0 && Double.parseDouble(minutos) != minutoAux) {
+            if (vibracion) {
                 vibrador.vibrate(500);
             }
-            if(sonido){
-                soundPool.play(carga, 1,1, 0,0,1);
+            if (sonido) {
+                soundPool.play(carga, 1, 1, 0, 0, 1);
             }
             minutoAux = Double.parseDouble(minutos);
         }
     }
+
     protected synchronized void buildGoogleApiClient() { //necesitamos la api de Google para ciertas funciones con los mapas.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)   //En este caso, necesitamos la api de google para recoger nuestra ubicacion
@@ -254,7 +261,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mMarcadorActual != null) {
             mMarcadorActual.remove(); //Borramos marcadores anteriores para no saturar el fragment del mapa.
         }
-
+        textoDistancia.setText(""); //Reseteamos el texto del contador.
         //Colocamos el marcador en la ubicacion actual dada por la API de Google y nuestro GPS.
         latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions(); //Ajustamos el LatLng a las coordenadas que devuelve el GPS.
@@ -262,13 +269,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markerOptions.title("Posicion actual"); //Titulo para el marcador.
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)); //Icono del marcador.
         mMarcadorActual = mMap.addMarker(markerOptions); //Añadimos el marcador al fragment del mapa.
-
         //Centramos la camara en nuestra ubicacion actual.
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
         //Añadimos el LatLng actual a la lista para, al acabar, obtener una distancia total
         latLngList.add(latLng);
-
         //Dibujamos la ruta
         if (rutaIniciada) {
             rectOptions.add(latLng).width(15)
@@ -288,20 +292,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
                 new AlertDialog.Builder(this)
-                        .setTitle("Location Permission Needed")
-                        .setMessage("This app needs the Location permission, please accept to use location functionality")
+                        .setTitle("Se necesitan los permisos de localizacion.")
+                        .setMessage("Esta app necesita los permisos de localizacion, por favor, aceptelos.")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                //Prompt the user once explanation has been shown
                                 ActivityCompat.requestPermissions(MapsActivity.this,
                                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                                         MY_PERMISSIONS_REQUEST_LOCATION);
@@ -310,7 +308,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .create()
                         .show();
             } else {
-                // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
@@ -323,11 +320,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // location-related task you need to do.
                     if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
@@ -337,20 +331,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.setMyLocationEnabled(true);
                     }
                 } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
                     Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show();
                 }
                 return;
             }
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
     public class ObtenerWebService extends AsyncTask<String, Void, String> {
         String devuelve = "";
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -375,7 +365,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         protected String doInBackground(String... strings) {
             if (strings[1] == "1") { //insercion
                 URL url;
-
                 try {
                     url = new URL(strings[0]);
                     HttpURLConnection urlConn;
@@ -391,22 +380,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     urlConn.connect();
                     //Creo el Objeto JSON
                     JSONObject jsonParam = new JSONObject();
-                    int horas=0;
-                    int minutos=0;
-                    int segundos=0;
-
-                    if (strings[3].length()==7){
-                        horas=Integer.parseInt(strings[3].substring(0,1));
-                        minutos=Integer.parseInt(strings[3].substring(2,4));
-                        segundos=Integer.parseInt(strings[3].substring(5,7));
-                    }else{
-                        minutos=Integer.parseInt(strings[3].substring(0,2));
-                        segundos=Integer.parseInt(strings[3].substring(3,5));
+                    int horas = 0;
+                    int minutos = 0;
+                    int segundos = 0;
+                    if (strings[3].length() == 7) {
+                        horas = Integer.parseInt(strings[3].substring(0, 1));
+                        minutos = Integer.parseInt(strings[3].substring(2, 4));
+                        segundos = Integer.parseInt(strings[3].substring(5, 7));
+                    } else {
+                        minutos = Integer.parseInt(strings[3].substring(0, 2));
+                        segundos = Integer.parseInt(strings[3].substring(3, 5));
                     }
-
-                    if (minutos>0)
-                        segundos+=(minutos*60)+(horas*3600);
-
+                    if (minutos > 0)
+                        segundos += (minutos * 60) + (horas * 3600);
                     jsonParam.put("distancia", Double.parseDouble(strings[2]));
                     jsonParam.put("tiempo", segundos);
                     // Envio los parámetros post.
@@ -416,34 +402,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     writer.write(jsonParam.toString());
                     writer.flush();
                     writer.close();
-
                     int respuesta = urlConn.getResponseCode();
-
-
                     StringBuilder result = new StringBuilder();
-
                     if (respuesta == HttpURLConnection.HTTP_OK) {
-
                         String line;
                         BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
                         while ((line = br.readLine()) != null) {
                             result.append(line);
-                            //response+=line;
                         }
-
                         //Creamos un objeto JSONObject para poder acceder a los atributos (campos) del objeto.
                         JSONObject respuestaJSON = new JSONObject(result.toString());   //Creo un JSONObject a partir del StringBuilder pasado a cadena
                         //Accedemos al vector de resultados
-
                         String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
-
                         if (resultJSON == "1") {      // hay una ruta que mostrar
                             devuelve = "Ruta insertada correctamente";
-
                         } else if (resultJSON == "2") {
                             devuelve = "La ruta no pudo insertarse";
                         }
-
                     }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -457,4 +432,3 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 }
-

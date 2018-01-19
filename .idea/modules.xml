@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/GitHub-proyecto_android.iml" filepath="$PROJECT_DIR$/GitHub-proyecto_android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/proyecto_android.iml" filepath="$PROJECT_DIR$/proyecto_android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/proyecto_android-app.iml" filepath="$PROJECT_DIR$/app/proyecto_android-app.iml" />
     </modules>
   </component>
 </project>
