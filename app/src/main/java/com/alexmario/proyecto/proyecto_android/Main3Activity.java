@@ -62,6 +62,7 @@ public class Main3Activity extends AppCompatActivity {
 =======
         String GETRUTAS = IP + "/obtener_usuariosapp.php";
 
+<<<<<<< HEAD
 >>>>>>> parent of f6a0f1d... limpieza de codigo
 =======
         String GETRUTAS = IP + "/obtener_usuariosapp.php";
@@ -69,6 +70,8 @@ public class Main3Activity extends AppCompatActivity {
 =======
         String GETRUTAS = IP + "/obtener_usuariosapp.php";
 >>>>>>> parent of 0b884ec... Retoques visuales
+=======
+>>>>>>> parent of f6a0f1d... limpieza de codigo
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -192,6 +195,7 @@ public class Main3Activity extends AppCompatActivity {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                     // hay contactos a mostrar
                     JSONArray usuarioJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
                     for (int i = 0; i < usuarioJSON.length(); i++) {
@@ -219,6 +223,8 @@ public class Main3Activity extends AppCompatActivity {
                                 esUsuario = true;
                                 usuarios.add(user);
 =======
+=======
+>>>>>>> parent of f6a0f1d... limpieza de codigo
                          // hay alumnos a mostrar
                         JSONArray alumnosJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
                         for (int i = 0; i < alumnosJSON.length(); i++) {
@@ -235,6 +241,9 @@ public class Main3Activity extends AppCompatActivity {
                                     esUsuario=true;
                                     usuarios.add(user);
                                 }
+<<<<<<< HEAD
+>>>>>>> parent of f6a0f1d... limpieza de codigo
+=======
 >>>>>>> parent of f6a0f1d... limpieza de codigo
                             }
                         }
