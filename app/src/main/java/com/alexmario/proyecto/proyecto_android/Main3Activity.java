@@ -16,6 +16,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,27 +36,36 @@ import java.util.List;
 
 public class Main3Activity extends AppCompatActivity {
 
+
     private ObtenerWebService hiloConexion;
+    private List<String[]> contactos;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private static final int SOLICITUD_PERMISO_READ_CONTACTS = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main3);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_contactos);
+
         recyclerView.setHasFixedSize(true);
         // use a linear layout manager
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         String IP = "http://servicioandroid.000webhostapp.com";
+<<<<<<< HEAD
         String GETUSUARIOS = IP + "/obtener_usuariosapp.php";
+=======
+        String GETRUTAS = IP + "/obtener_usuariosapp.php";
+
+>>>>>>> parent of f6a0f1d... limpieza de codigo
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
+            //mostrarUsuariosApp();
+            //obtenerContactos();
             if (hayConexion(getApplicationContext())) {//Si estamos conectados a internet
                 hiloConexion = new Main3Activity.ObtenerWebService();
                 hiloConexion.execute(GETUSUARIOS, "1");
@@ -63,8 +74,9 @@ public class Main3Activity extends AppCompatActivity {
             solicitarPermiso(Manifest.permission.READ_CONTACTS,
                     "No puedes leer contactos sin permiso", SOLICITUD_PERMISO_READ_CONTACTS, this);
         }
-    }
 
+        //mostrarUsuariosApp();
+    }
     private boolean hayConexion(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context
                 .CONNECTIVITY_SERVICE); //Comprobamos que estamos conectados a internet
@@ -94,11 +106,14 @@ public class Main3Activity extends AppCompatActivity {
             ActivityCompat.requestPermissions(actividad,
                     new String[]{permiso}, requestCode);
         }
+
     }
 
     private List<Usuario> mostrarUsuariosApp() {
 
-        List<Usuario> listaUsuarios = new ArrayList<>();
+
+        List<Usuario> listaUsuarios=new ArrayList<>();
+
 
         String[] projeccion = new String[]{
                 ContactsContract.Data._ID,
@@ -118,8 +133,9 @@ public class Main3Activity extends AppCompatActivity {
                 null,
                 sortOrder);
 
-        while (c.moveToNext()) {
-            Usuario u = new Usuario(c.getString(1), c.getString(2));
+
+        while (c.moveToNext()){
+            Usuario u=new Usuario(c.getString(1),c.getString(2));
             listaUsuarios.add(u);
         }
 
@@ -139,6 +155,7 @@ public class Main3Activity extends AppCompatActivity {
             List<Usuario> usuarios = new ArrayList<>();
             List<Usuario> contactos = mostrarUsuariosApp();
 
+
             try {
                 url = new URL(cadena);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection(); //Abrir la conexión
@@ -146,9 +163,12 @@ public class Main3Activity extends AppCompatActivity {
                         " (Linux; Android 1.5; es-ES) Ejemplo HTTP");
                 //connection.setHeader("content-type", "application/json");
                 int respuesta = connection.getResponseCode();
+
                 StringBuilder result = new StringBuilder();
+
                 if (respuesta == HttpURLConnection.HTTP_OK) {
                     InputStream in = new BufferedInputStream(connection.getInputStream());  // preparo la cadena de entrada
+
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));  // la introduzco en un BufferedReader
                     // El siguiente proceso lo hago porque el JSONOBject necesita un String y tengo
                     // que tranformar el BufferedReader a String. Esto lo hago a traves de un
@@ -161,6 +181,7 @@ public class Main3Activity extends AppCompatActivity {
                     JSONObject respuestaJSON = new JSONObject(result.toString());   //Creo un JSONObject a partir del StringBuilder pasado a cadena
                     //Accedemos al vector de resultados
                     String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
+<<<<<<< HEAD
                     // hay contactos a mostrar
                     JSONArray usuarioJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
                     for (int i = 0; i < usuarioJSON.length(); i++) {
@@ -174,12 +195,33 @@ public class Main3Activity extends AppCompatActivity {
                             if (user.getNumero().equals(u.getNumero())) {
                                 esUsuario = true;
                                 usuarios.add(user);
+=======
+                         // hay alumnos a mostrar
+                        JSONArray alumnosJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
+                        for (int i = 0; i < alumnosJSON.length(); i++) {
+                            contacto[0] = alumnosJSON.getJSONObject(i).getString("id");
+                            contacto[1] = alumnosJSON.getJSONObject(i).getString("nombre");
+                            contacto[2] = alumnosJSON.getJSONObject(i).getString("telefono");
+                            //datos.add(contacto);
+                            Usuario u=new Usuario(contacto);
+                            boolean esUsuario=false;
+
+
+                            for (Usuario user: contactos){
+                                if (user.getNumero().equals(u.getNumero())){
+                                    esUsuario=true;
+                                    usuarios.add(user);
+                                }
+>>>>>>> parent of f6a0f1d... limpieza de codigo
                             }
                         }
-                    }
+
+
+
                     List<Usuario> input = usuarios;
                     mAdapter = new UsuariosAdapter(input);
                 }
+
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -198,7 +240,10 @@ public class Main3Activity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<String[]> s) {
             //super.onPostExecute(s);
+            //contactos = s;
+
             recyclerView.setAdapter(mAdapter);
+
         }
 
         @Override
