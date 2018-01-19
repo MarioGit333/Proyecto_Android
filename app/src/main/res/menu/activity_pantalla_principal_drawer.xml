@@ -11,11 +11,23 @@
         <item
             android:id="@+id/pantalla2"
             android:icon="@drawable/ic_menu_gallery"
+<<<<<<< HEAD
             android:title="Estadisticas" />
         <item
             android:id="@+id/pantalla3"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Contactos" />
+=======
+            android:title="Ver últimas rutas" />
+        <item
+            android:id="@+id/pantalla3"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="Pantalla 3" />
+        <item
+            android:id="@+id/pantalla4"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Pantalla 4" />
+>>>>>>> parent of 0b884ec... Retoques visuales
     </group>
 
     <item android:title="Configuracion">

@@ -66,6 +66,8 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ViewHo
         // - replace the contents of the view with that element
         final String nombre = values.get(position).getNombre();
         final String numero = values.get(position).getNumero();
+
+
         holder.txtHeader.setText(nombre);
         /*holder.txtHeader.setOnClickListener(new OnClickListener() {
             @Override

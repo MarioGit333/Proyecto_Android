@@ -56,11 +56,15 @@ public class Main3Activity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         String IP = "http://servicioandroid.000webhostapp.com";
 <<<<<<< HEAD
+<<<<<<< HEAD
         String GETUSUARIOS = IP + "/obtener_usuariosapp.php";
 =======
         String GETRUTAS = IP + "/obtener_usuariosapp.php";
 
 >>>>>>> parent of f6a0f1d... limpieza de codigo
+=======
+        String GETRUTAS = IP + "/obtener_usuariosapp.php";
+>>>>>>> parent of 0b884ec... Retoques visuales
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -68,7 +72,7 @@ public class Main3Activity extends AppCompatActivity {
             //obtenerContactos();
             if (hayConexion(getApplicationContext())) {//Si estamos conectados a internet
                 hiloConexion = new Main3Activity.ObtenerWebService();
-                hiloConexion.execute(GETUSUARIOS, "1");
+                hiloConexion.execute(GETRUTAS, "1");
             }
         } else {
             solicitarPermiso(Manifest.permission.READ_CONTACTS,
@@ -182,12 +186,21 @@ public class Main3Activity extends AppCompatActivity {
                     //Accedemos al vector de resultados
                     String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
 <<<<<<< HEAD
+<<<<<<< HEAD
                     // hay contactos a mostrar
                     JSONArray usuarioJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
                     for (int i = 0; i < usuarioJSON.length(); i++) {
                         contacto[0] = usuarioJSON.getJSONObject(i).getString("id");
                         contacto[1] = usuarioJSON.getJSONObject(i).getString("nombre");
                         contacto[2] = usuarioJSON.getJSONObject(i).getString("telefono");
+=======
+                    // hay alumnos a mostrar
+                    JSONArray alumnosJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
+                    for (int i = 0; i < alumnosJSON.length(); i++) {
+                        contacto[0] = alumnosJSON.getJSONObject(i).getString("id");
+                        contacto[1] = alumnosJSON.getJSONObject(i).getString("nombre");
+                        contacto[2] = alumnosJSON.getJSONObject(i).getString("telefono");
+>>>>>>> parent of 0b884ec... Retoques visuales
                         //datos.add(contacto);
                         Usuario u = new Usuario(contacto);
                         boolean esUsuario = false;
