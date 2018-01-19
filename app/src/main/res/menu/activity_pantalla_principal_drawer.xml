@@ -12,6 +12,7 @@
             android:id="@+id/pantalla2"
             android:icon="@drawable/ic_menu_gallery"
 <<<<<<< HEAD
+<<<<<<< HEAD
             android:title="Estadisticas" />
         <item
             android:id="@+id/pantalla3"
@@ -22,6 +23,12 @@
         <item
             android:id="@+id/pantalla3"
             android:icon="@drawable/ic_menu_slideshow"
+=======
+            android:title="Ver últimas rutas" />
+        <item
+            android:id="@+id/pantalla3"
+            android:icon="@drawable/ic_menu_slideshow"
+>>>>>>> parent of 0b884ec... Retoques visuales
             android:title="Pantalla 3" />
         <item
             android:id="@+id/pantalla4"

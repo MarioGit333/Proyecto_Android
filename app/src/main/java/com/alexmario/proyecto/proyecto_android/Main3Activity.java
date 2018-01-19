@@ -57,11 +57,15 @@ public class Main3Activity extends AppCompatActivity {
         String IP = "http://servicioandroid.000webhostapp.com";
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         String GETUSUARIOS = IP + "/obtener_usuariosapp.php";
 =======
         String GETRUTAS = IP + "/obtener_usuariosapp.php";
 
 >>>>>>> parent of f6a0f1d... limpieza de codigo
+=======
+        String GETRUTAS = IP + "/obtener_usuariosapp.php";
+>>>>>>> parent of 0b884ec... Retoques visuales
 =======
         String GETRUTAS = IP + "/obtener_usuariosapp.php";
 >>>>>>> parent of 0b884ec... Retoques visuales
@@ -187,6 +191,7 @@ public class Main3Activity extends AppCompatActivity {
                     String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                     // hay contactos a mostrar
                     JSONArray usuarioJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
                     for (int i = 0; i < usuarioJSON.length(); i++) {
@@ -194,12 +199,17 @@ public class Main3Activity extends AppCompatActivity {
                         contacto[1] = usuarioJSON.getJSONObject(i).getString("nombre");
                         contacto[2] = usuarioJSON.getJSONObject(i).getString("telefono");
 =======
+=======
+>>>>>>> parent of 0b884ec... Retoques visuales
                     // hay alumnos a mostrar
                     JSONArray alumnosJSON = respuestaJSON.getJSONArray("usuariosapp");   // estado es el nombre del campo en el JSON
                     for (int i = 0; i < alumnosJSON.length(); i++) {
                         contacto[0] = alumnosJSON.getJSONObject(i).getString("id");
                         contacto[1] = alumnosJSON.getJSONObject(i).getString("nombre");
                         contacto[2] = alumnosJSON.getJSONObject(i).getString("telefono");
+<<<<<<< HEAD
+>>>>>>> parent of 0b884ec... Retoques visuales
+=======
 >>>>>>> parent of 0b884ec... Retoques visuales
                         //datos.add(contacto);
                         Usuario u = new Usuario(contacto);
