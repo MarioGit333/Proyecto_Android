@@ -34,30 +34,20 @@ class Distanciastiempos
         }
     }
 
-    /**
-     * Obtiene los campos de un Alumno con un identificador
-     * determinado
-     *
-     * @param $idAlumno Identificador del alumno
-     * @return mixed
-     */
-    public static function getById($idAlumno)
+    public static function getById($usuario)
     {
-        // Consulta de la tabla Alumnos
-        $consulta = "SELECT id,
-                            distancia,
-                            tiempo
+        $consulta = "SELECT *
                              FROM distanciatiempo
-                             WHERE id = ?";
+                             WHERE usuario = ?";
 
         try {
             // Preparar sentencia
             $comando = Database::getInstance()->getDb()->prepare($consulta);
             // Ejecutar sentencia preparada
-            $comando->execute(array($idAlumno));
+            $comando->execute(array($usuario));
             // Capturar primera fila del resultado
-            $row = $comando->fetch(PDO::FETCH_ASSOC);
-            return $row;
+            return $comando->fetchAll(PDO::FETCH_ASSOC);
+             
 
         } catch (PDOException $e) {
             // Aqu� puedes clasificar el error dependiendo de la excepci�n
@@ -86,14 +76,16 @@ class Distanciastiempos
      */
     public static function insert(
         $distancia,
-        $tiempo
+        $tiempo,
+		$usuario
     )
     {
         // Sentencia INSERT
         $comando = "INSERT INTO distanciatiempo ( " .
             "distancia," .
-            " tiempo)" .
-            " VALUES( ?,?)";
+			"tiempo," .
+            " usuario)" .
+            " VALUES( ?,?, ?)";
 
         // Preparar la sentencia
         $sentencia = Database::getInstance()->getDb()->prepare($comando);
@@ -101,7 +93,8 @@ class Distanciastiempos
         return $sentencia->execute(
             array(
                 $distancia,
-                $tiempo
+                $tiempo,
+				$usuario
             )
         );
 

@@ -5,15 +5,15 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +37,8 @@ public class Main2Activity extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<Ruta> rutas = new ArrayList<>();
+    private String todos = "http://servicioandroid.000webhostapp.com/obtener_distanciastiempos.php";
+    private String personal = "http://servicioandroid.000webhostapp.com/obtener_distanciatiempoporusuario.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +48,8 @@ public class Main2Activity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        String IP = "http://servicioandroid.000webhostapp.com";
-        // Rutas de los Web Services
-        String GETRUTAS = IP + "/obtener_distanciastiempos.php";
-        if (hayConexion(getApplicationContext())) {//Si estamos conectados a internet
-            hiloConexion = new ObtenerWebService();
-            hiloConexion.execute(GETRUTAS, "1");
-        }
-
-
+        personal += "?usuario=" + Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.opciones_array,
@@ -67,12 +62,15 @@ public class Main2Activity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                if (position==0){
-                    //Mostrar rutas del usuario
-                }else{
-                    //Mostrar Ranking
+                if (hayConexion(getApplicationContext())) {//Si estamos conectados a internet
+                    hiloConexion = new ObtenerWebService();
+                    if (position == 0) {
+                        hiloConexion.execute(todos, "1");
+                    } else {
+                        hiloConexion.execute(personal, "1");
+                    }
                 }
+                recyclerView.clearOnChildAttachStateChangeListeners();
             }
 
             @Override
@@ -94,9 +92,6 @@ public class Main2Activity extends AppCompatActivity {
         }
         return true;
     }
-
-
-
 
 
     public class ObtenerWebService extends AsyncTask<String, Void, String> {
@@ -128,9 +123,10 @@ public class Main2Activity extends AppCompatActivity {
                         JSONObject respuestaJSON = new JSONObject(result.toString());   //Creo un JSONObject a partir del StringBuilder pasado a cadena
                         //Accedemos al vector de resultados
                         String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
-                        System.out.println(resultJSON);
                         if (resultJSON.equals("1")) {      // hay rutas a mostrar
+
                             JSONArray rutasJSON = respuestaJSON.getJSONArray("distanciastiempo");   // estado es el nombre del campo en el JSON
+                            Log.d("TAMAÑACION", "DESPUESION");
                             for (int i = 0; i < rutasJSON.length(); i++) {
                                 int segundos = Integer.parseInt(rutasJSON.getJSONObject(i).getString("tiempo"));
                                 int minutos = 0;

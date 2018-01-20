@@ -398,6 +398,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Settings.Secure.ANDROID_ID);
                     jsonParam.put("distancia", Double.parseDouble(strings[2]));
                     jsonParam.put("tiempo", segundos);
+                    jsonParam.put("usuario",id);
                     // Envio los parámetros post.
                     OutputStream os = urlConn.getOutputStream();
                     BufferedWriter writer = new BufferedWriter(

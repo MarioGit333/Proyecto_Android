@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Insertar Alumno
     $retorno = Distanciastiempos::insert(
         $body['distancia'],
-        $body['tiempo']);
+		$body['tiempo'],
+        $body['usuario']);
 
     if ($retorno) {
         $json_string = json_encode(array("estado" => 1,"mensaje" => "Creacion correcta"));
