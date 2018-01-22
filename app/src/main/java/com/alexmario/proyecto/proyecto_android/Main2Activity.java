@@ -36,7 +36,7 @@ public class Main2Activity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager layoutManager;
-    private ArrayList<Ruta> rutas = new ArrayList<>();
+    private ArrayList<Ruta> rutas;
     private String todos = "http://servicioandroid.000webhostapp.com/obtener_distanciastiempos.php";
     private String personal = "http://servicioandroid.000webhostapp.com/obtener_distanciatiempoporusuario.php";
 
@@ -65,9 +65,9 @@ public class Main2Activity extends AppCompatActivity {
                 if (hayConexion(getApplicationContext())) {//Si estamos conectados a internet
                     hiloConexion = new ObtenerWebService();
                     if (position == 0) {
-                        hiloConexion.execute(todos, "1");
-                    } else {
                         hiloConexion.execute(personal, "1");
+                    } else {
+                        hiloConexion.execute(todos, "1");
                     }
                 }
                 recyclerView.clearOnChildAttachStateChangeListeners();
@@ -124,7 +124,7 @@ public class Main2Activity extends AppCompatActivity {
                         //Accedemos al vector de resultados
                         String resultJSON = respuestaJSON.getString("estado");   // estado es el nombre del campo en el JSON
                         if (resultJSON.equals("1")) {      // hay rutas a mostrar
-
+                            rutas = new ArrayList<>();
                             JSONArray rutasJSON = respuestaJSON.getJSONArray("distanciastiempo");   // estado es el nombre del campo en el JSON
                             Log.d("TAMAÑACION", "DESPUESION");
                             for (int i = 0; i < rutasJSON.length(); i++) {
