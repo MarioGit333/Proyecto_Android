@@ -6,30 +6,25 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/pantalla1"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@mipmap/ic_mapfg"
             android:title="Iniciar Ruta" />
         <item
             android:id="@+id/pantalla2"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@mipmap/ic_launcher_foreground"
             android:title="Estadisticas"/>
 
             android:title="Estadisticas" />
         <item
             android:id="@+id/pantalla3"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@mipmap/ic_contacts_foreground"
             android:title="Contactos" />
-
-        <item
-            android:id="@+id/pantalla4"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Pantalla 4" />
     </group>
 
     <item android:title="Configuracion">
         <menu>
             <item
                 android:id="@+id/settings"
-                android:icon="@mipmap/ic_settings"
+                android:icon="@mipmap/ic_settings_fg"
                 android:title="Opciones" />
         </menu>
     </item>

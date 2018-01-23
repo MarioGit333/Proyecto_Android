@@ -75,12 +75,8 @@ public class Main2Activity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                //Another interface callback
             }
         });
-
-        //spinner.setOnItemSelectedListener();
-
     }
 
     private boolean hayConexion(Context context) {
@@ -92,7 +88,6 @@ public class Main2Activity extends AppCompatActivity {
         }
         return true;
     }
-
 
     public class ObtenerWebService extends AsyncTask<String, Void, String> {
         @Override
